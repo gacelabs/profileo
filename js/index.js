@@ -40,7 +40,7 @@ function statusChangeCallback(response) {
 	if (response.status === 'connected') {
 		// Logged into your app and Facebook.
 		const shortLivedToken = response.authResponse.accessToken;
-		const expirationTime = new Date.now() + 60 * 24 * 60 * 60 * 1000; // 60 days
+		const expirationTime = Date.now() + 60 * 24 * 60 * 60 * 1000; // 60 days
 		storeToken(shortLivedToken, expirationTime);
 		checkFacebookProfile(shortLivedToken);
 	} else {
