@@ -39,10 +39,10 @@ document.addEventListener('DOMContentLoaded', function () {
 function statusChangeCallback(response) {
 	if (response.status === 'connected') {
 		// Logged into your app and Facebook.
-		const shortLivedToken = response.authResponse.accessToken;
-		const expirationTime = Date.now() + 60 * 24 * 60 * 60 * 1000; // 60 days
-		storeToken(shortLivedToken, expirationTime);
-		checkFacebookProfile(shortLivedToken);
+		// const shortLivedToken = response.authResponse.accessToken;
+		// const expirationTime = Date.now() + 60 * 24 * 60 * 60 * 1000; // 60 days
+		// storeToken(shortLivedToken, expirationTime);
+		checkFacebookProfile(response.authResponse.accessToken);
 	} else {
 		// The person is not logged into your app or we are unable to tell.
 		notifyUser('Please log into Facebook.');
@@ -86,6 +86,7 @@ async function fetchFacebookProfileData(accessToken) {
 	return fetch(`https://graph.facebook.com/v13.0/me?fields=about,name,picture&access_token=${accessToken}`)
 		.then(response => response.json())
 		.then(data => {
+			console.log(data);
 			// Check for issues in the profile data
 			let hasIssues = false;
 
