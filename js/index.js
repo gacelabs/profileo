@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function () {
 			appId: '683063910346451', // Replace with your Facebook App ID
 			cookie: true,
 			xfbml: true,
-			version: 'v13.0'
+			version: 'v19.0'
 		});
 		FB.AppEvents.logPageView();
 
