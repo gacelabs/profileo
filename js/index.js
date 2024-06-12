@@ -40,11 +40,9 @@ function statusChangeCallback(response) {
 	if (response.status === 'connected') {
 		// Logged into your app and Facebook.
 		const shortLivedToken = response.authResponse.accessToken;
-		getLongLivedToken(shortLivedToken).then(longLivedToken => {
-			const expirationTime = Date.now() + 60 * 24 * 60 * 60 * 1000; // 60 days
-			storeToken(longLivedToken, expirationTime);
-			checkFacebookProfile(longLivedToken);
-		});
+		const expirationTime = new Date.now() + 60 * 24 * 60 * 60 * 1000; // 60 days
+		storeToken(shortLivedToken, expirationTime);
+		checkFacebookProfile(shortLivedToken);
 	} else {
 		// The person is not logged into your app or we are unable to tell.
 		notifyUser('Please log into Facebook.');
@@ -76,7 +74,11 @@ function checkFacebookProfile(accessToken) {
 			notifyUser('Error checking profile. Please try again later.');
 		});
 	} else {
-		facebookLogin();
+		getLongLivedToken(accessToken).then(longLivedToken => {
+			const expirationTime = new Date.now() + 60 * 24 * 60 * 60 * 1000; // 60 days
+			storeToken(longLivedToken, expirationTime);
+			checkFacebookProfile(longLivedToken);
+		});
 	}
 }
 
