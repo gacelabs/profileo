@@ -59,27 +59,69 @@ function facebookLogin() {
 	}, { scope: 'public_profile,email' });
 }
 
+// function checkFacebookProfile(accessToken) {
+// 	// if (isTokenExpired() == false) {
+// 		fetchFacebookProfileData(accessToken)
+// 		.then(data => {
+// 			if (data.hasIssues) {
+// 				notifyUser('There are issues on your Facebook profile.');
+// 			} else {
+// 				console.log('Profile is in good standing.');
+// 			}
+// 		})
+// 		.catch(error => {
+// 			console.error('Error checking profile:', error);
+// 			notifyUser('Error checking profile. Please try again later.');
+// 		});
+// 	// } else {
+// 	// 	getLongLivedToken(accessToken).then(longLivedToken => {
+// 	// 		const expirationTime = new Date.now() + 60 * 24 * 60 * 60 * 1000; // 60 days
+// 	// 		storeToken(longLivedToken, expirationTime);
+// 	// 		checkFacebookProfile(longLivedToken);
+// 	// 	});
+// 	// }
+// }
+
 function checkFacebookProfile(accessToken) {
-	// if (isTokenExpired() == false) {
-		fetchFacebookProfileData(accessToken)
-		.then(data => {
-			if (data.hasIssues) {
-				notifyUser('There are issues on your Facebook profile.');
-			} else {
-				console.log('Profile is in good standing.');
-			}
-		})
-		.catch(error => {
-			console.error('Error checking profile:', error);
-			notifyUser('Error checking profile. Please try again later.');
-		});
-	// } else {
-	// 	getLongLivedToken(accessToken).then(longLivedToken => {
-	// 		const expirationTime = new Date.now() + 60 * 24 * 60 * 60 * 1000; // 60 days
-	// 		storeToken(longLivedToken, expirationTime);
-	// 		checkFacebookProfile(longLivedToken);
-	// 	});
-	// }
+    FB.api('/me/accounts', 'GET', { access_token: accessToken }, function(response) {
+        if (response && !response.error) {
+            const pages = response.data;
+            pages.forEach(page => {
+                checkPageInsights(page.id, accessToken);
+            });
+        } else {
+            console.error('Error fetching pages:', response.error);
+            notifyUser('Error fetching pages. Please try again later.');
+        }
+    });
+}
+
+function checkPageInsights(pageId, accessToken) {
+    FB.api(`/${pageId}/insights`, 'GET', { access_token: accessToken }, function(response) {
+        if (response && !response.error) {
+            analyzeInsights(response.data);
+        } else {
+            console.error('Error fetching insights:', response.error);
+            notifyUser('Error fetching insights. Please try again later.');
+        }
+    });
+}
+
+function analyzeInsights(insights) {
+    let hasIssues = false;
+    insights.forEach(insight => {
+        // Implement your logic to determine if there are issues
+        if (insight.name === 'page_engaged_users' && insight.values[0].value < 100) {
+            hasIssues = true;
+        }
+        // Add other checks based on different insight metrics
+    });
+
+    if (hasIssues) {
+        notifyUser('There are issues on your Facebook page insights.');
+    } else {
+        console.log('Profile insights are in good standing.');
+    }
 }
 
 async function fetchFacebookProfileData(accessToken) {
@@ -107,7 +149,7 @@ function notifyUser(message) {
 	if (Notification.permission === "granted") {
 		new Notification("Profile Notifier", {
 			body: message,
-			icon: "icon.png" // Optionally include an icon
+			icon: "images/icon.png" // Optionally include an icon
 		});
 	} else {
 		document.getElementById('notification').innerHTML = message;
