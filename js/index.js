@@ -60,7 +60,7 @@ function facebookLogin() {
 }
 
 function checkFacebookProfile(accessToken) {
-	if (isTokenExpired() == false) {
+	// if (isTokenExpired() == false) {
 		fetchFacebookProfileData(accessToken)
 		.then(data => {
 			if (data.hasIssues) {
@@ -73,13 +73,13 @@ function checkFacebookProfile(accessToken) {
 			console.error('Error checking profile:', error);
 			notifyUser('Error checking profile. Please try again later.');
 		});
-	} else {
-		getLongLivedToken(accessToken).then(longLivedToken => {
-			const expirationTime = new Date.now() + 60 * 24 * 60 * 60 * 1000; // 60 days
-			storeToken(longLivedToken, expirationTime);
-			checkFacebookProfile(longLivedToken);
-		});
-	}
+	// } else {
+	// 	getLongLivedToken(accessToken).then(longLivedToken => {
+	// 		const expirationTime = new Date.now() + 60 * 24 * 60 * 60 * 1000; // 60 days
+	// 		storeToken(longLivedToken, expirationTime);
+	// 		checkFacebookProfile(longLivedToken);
+	// 	});
+	// }
 }
 
 async function fetchFacebookProfileData(accessToken) {
